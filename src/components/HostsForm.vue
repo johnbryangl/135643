@@ -201,7 +201,7 @@ export default {
     return {
       countries: countries,
       checkedTerms: false,
-      termsUrl: "http://localhost:5000/terms.pdf",
+      termsUrl: "https://e-see.azurewebsites.net/terms.pdf",
       activeStep: 1,
       rules: {
         id: [
