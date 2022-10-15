@@ -158,7 +158,7 @@ export default createStore({
       }
     },
     initializeWebsocket({ commit, state }) {
-      const websocket = new WebSocket(`ws://localhost:5000/`);
+      const websocket = new WebSocket(`wss://e-see.azurewebsites.net/`);
       commit("CONNECT_WEBSOCKET", { websocket });
 
       state.websocket.onopen = function () {
