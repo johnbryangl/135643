@@ -20,7 +20,7 @@
     />
 
     <!-- --------- CSS Files --------- -->
-    <link rel="stylesheet" href="http://localhost:5000/istyle.css" />
+    <link rel="stylesheet" href="https://e-see.azurewebsites.net/istyle.css" />
   </head>
 
   <body>
