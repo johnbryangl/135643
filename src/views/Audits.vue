@@ -5,7 +5,8 @@ div
   el-divider
   SearchBar(v-model='search' @update:modelValue='searchNow')
   div
-    
+    //- report metadata
+    ReportMetadata(:isExporting='isExporting' :exportDate='exportDate'  reportName='List of Audited Admin Logins')
     div(v-if='auditsAdmin.length > 0')
       el-card(shadow='never' :body-style='{padding:0}')
         div.px-5.py-4.common-gradient

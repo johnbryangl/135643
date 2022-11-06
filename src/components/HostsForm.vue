@@ -8,14 +8,13 @@ el-card(shadow='never' :body-style='{padding:0}')
       span(v-else)
         i.bi.bi-info-circle-fill.me-3
         | Application Info
-  
   div.p-5
     .d-flex.justify-content-end 
-      div(v-if='!$store.state.userDetails.adminLevel.includes("admin") && !$route.query.action && $route.name == "ViewHost"')
-        el-button(link @click='$router.push({ name: "EditHost", params: { id: modelValue.id } })').mb-3
+      div(v-if='!$store.state.userDetails.adminLevel.includes("admin") && !($route.query.action == "account-settings") && $route.name == "ViewHost"')
+        el-button(link @click='$router.push({ name: "EditHost", params: { id: modelValue.id }, query: { action: "account-settings" } })').mb-3
           template(#icon)
             i.bi.bi-pencil-square.fs-5(style="color: #47a9f5")
-      div(v-else-if='!$store.state.userDetails.adminLevel.includes("admin") && !$route.query.action && $route.name == "EditHost"')
+      div(v-else-if='!$store.state.userDetails.adminLevel.includes("admin") && ($route.query.action == "account-settings") && $route.name == "EditHost"')
         el-button(link @click='$router.push({ name: "ViewHost", params: { id: modelValue.id } })').mb-3
           template(#icon)
             i.bi.bi-arrow-left-circle-fill.fs-5(style="color: #47a9f5")
@@ -57,13 +56,13 @@ el-card(shadow='never' :body-style='{padding:0}')
         div(v-show="activeStep === 1 || (!activeStep === 3)")
           el-form-item(label='First name' prop="firstName")
             .w-100(v-if="mode !== 'view'")
-              el-input(v-model='modelValue.firstName' @input="emitValue({ firstName: $event })" name="firstName" required)
+              el-input(v-model='modelValue.firstName' @keypress="$store.getters.isNotNumber($event)" @input="emitValue({ firstName: $event })" name="firstName" required)
             .w-100(v-else) {{ modelValue.firstName }}
 
           el-form-item(label='Last name' prop="lastName")
             .w-100(v-if="mode !== 'view'")
               
-              el-input(v-model='modelValue.lastName' @input="emitValue({ lastName: $event })" name="lastName" required)
+              el-input(v-model='modelValue.lastName' @keypress="$store.getters.isNotNumber($event)" @input="emitValue({ lastName: $event })" name="lastName" required)
             .w-100(v-else) {{ modelValue.lastName }}
         
           el-form-item(label='Birth date' prop="birthDate")
@@ -94,7 +93,7 @@ el-card(shadow='never' :body-style='{padding:0}')
         
           el-form-item(label='Mobile number' prop="mobileNumber")
             .w-100(v-if="mode !== 'view'")
-              el-input(v-model='modelValue.mobileNumber' @input="emitValue({ mobileNumber: $event })" name="mobileNumber" required)
+              el-input(v-model='modelValue.mobileNumber' @keypress="$store.getters.isNumber($event)" @input="emitValue({ mobileNumber: $event })" name="mobileNumber" required)
             .w-100(v-else) {{ modelValue.mobileNumber }}
 
           el-form-item(label='Profile picture' v-if="!isForPending && mode !== 'view'")
@@ -109,7 +108,7 @@ el-card(shadow='never' :body-style='{padding:0}')
 
           el-form-item(label='UPLive ID' prop="id")
             .w-100(v-if="mode !== 'view'")
-              el-input(v-model='modelValue.id' @input="emitValue({ id: $event })" name="id" required)
+              el-input(v-model='modelValue.id' @keypress="$store.getters.isNumber($event)" @input="emitValue({ id: $event })" name="id" required)
             .w-100(v-else) {{ modelValue.id }}
 
           el-form-item(label='Instagram account URL' prop="instagramAccount")
@@ -134,8 +133,11 @@ el-card(shadow='never' :body-style='{padding:0}')
             .w-100(v-if="mode !== 'view'")
               el-input(v-model='modelValue.email' @input="emitValue({ email: $event })" name="email" type="email"  required)
             .w-100(v-else) {{ modelValue.email }}
+
+          el-form-item(label='Old password' v-if='$route.query.action')
+            el-input(v-model='modelValue.oldPassword' @input="emitValue({ oldPassword: $event })" name="oldPassword" type='password'  show-password :required='true')
             
-          el-form-item(label='Password' v-if="!isForPending && mode !== 'view'" prop="password")
+          el-form-item(:label=`$route.query.action? 'New password': 'Password'` v-if="!isForPending && mode !== 'view'" prop="password")
             el-input(v-model='modelValue.password' @input="emitValue({ password: $event })" name="password" type='password'  show-password :required='mode == "create"')
 
           el-form-item(label='Confirm password' v-if="!isForPending && mode !== 'view'" prop="confirmPassword")
@@ -144,12 +146,12 @@ el-card(shadow='never' :body-style='{padding:0}')
       template(v-if="activeStep === 3")
         el-form-item(label='Talent manager' prop="talentManager")
           .w-100(v-if="mode !== 'view'")
-            el-input(v-model='modelValue.talentManager' @input="emitValue({ talentManager: $event })" name="talentManager" required)
+            el-input(v-model='modelValue.talentManager' @keypress="$store.getters.isNotNumber($event)" @input="emitValue({ talentManager: $event })" name="talentManager" required)
           .w-100(v-else) {{ modelValue.talentManager }}
 
         el-form-item(label='Referred by' prop="referralName")
           .w-100(v-if="mode !== 'view'")
-            el-input(v-model='modelValue.referralName' @input="emitValue({ referralName: $event })" name="referralName" required)
+            el-input(v-model='modelValue.referralName' @keypress="$store.getters.isNotNumber($event)" @input="emitValue({ referralName: $event })" name="referralName" required)
           .w-100(v-else) {{ modelValue.referralName }}
 
         el-form-item(label='Special talent' prop="specialTalent")
@@ -375,7 +377,17 @@ export default {
       // eslint-disable-next-line no-unused-vars
       await this.$refs.formRef.validate((valid, fields) => {
         if (valid) {
-          this.$emit("submitForm", event);
+          if (!this.isForPending) {
+            this.$emit("submitForm", event);
+          } else {
+            if (!this.checkedTerms) {
+              alert(
+                "You must agree with the terms and conditions before proceeding."
+              );
+            } else {
+              this.$emit("submitForm", event);
+            }
+          }
         }
       });
     },

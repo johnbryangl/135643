@@ -19,8 +19,9 @@ div
 <script>
 import { apiClient } from "@/services/MainService";
 import AdministratorsForm from "@/components/AdministratorsForm.vue";
+import store from "@/store";
 export default {
-  name: "CreateEditAdministrato",
+  name: "CreateEditAdministrator",
   components: {
     AdministratorsForm,
   },
@@ -28,6 +29,7 @@ export default {
     return {
       form: {
         email: "",
+        oldPassword: "",
         password: "",
         confirmPassword: "",
         lastName: "",
@@ -38,7 +40,8 @@ export default {
         country: "",
         mobileNumber: "",
         // eslint-disable-next-line prettier/prettier
-        avatarImageUrl: "https://ik.imagekit.io/intelliemed/default-avatar_cunOc4PbJ.jpg?ik-sdk-version=javascript-1.4.3&updatedAt=1660126551582",
+        avatarImageUrl:
+          "https://ik.imagekit.io/intelliemed/default-avatar_cunOc4PbJ.jpg?ik-sdk-version=javascript-1.4.3&updatedAt=1660126551582",
       },
       isLoading: false,
     };
@@ -86,9 +89,13 @@ export default {
         }
       } else {
         try {
-          await apiClient.patch(`/admins/${this.$route.params.id}`, form, {
-            headers: { "Content-Type": "multipart/form-data" },
-          });
+          const { data } = await apiClient.patch(
+            `/admins/${this.$route.params.id}`,
+            form,
+            {
+              headers: { "Content-Type": "multipart/form-data" },
+            }
+          );
           if (!this.$route.query.action) {
             // eslint-disable-next-line no-undef
             ElNotification({
@@ -107,6 +114,12 @@ export default {
               type: "success",
               duration: 5000,
             });
+            const newName = data?.result[1][0]?.fullName;
+            const newEmail = data?.result[1][0]?.email;
+            let userDetails = JSON.parse(localStorage.getItem("userDetails"));
+            userDetails.fullName = newName;
+            userDetails.email = newEmail;
+            localStorage.setItem("userDetails", JSON.stringify(userDetails));
             setTimeout(() => location.reload(), 900);
           }
         } catch (error) {
@@ -132,14 +145,20 @@ export default {
   async beforeRouteEnter(routeTo, routeFrom, next) {
     try {
       const id = routeTo.params.id;
+      const role = store.state.userDetails.adminLevel;
+      const myId = store.state.userDetails.id;
       if (id) {
-        const { data } = await apiClient.get(`/admins/${id}`);
-        next((component) => {
-          delete data.result.password;
-          component.form = data.result;
-        });
+        if (role == "superadmin" || (routeTo.query.action && id == myId)) {
+          const { data } = await apiClient.get(`/admins/${id}`);
+          next((component) => {
+            delete data.result.password;
+            component.form = data.result;
+          });
+        }
       } else {
-        next();
+        if (role == "superadmin") {
+          next();
+        }
       }
     } catch (error) {
       console.log(error);

@@ -89,7 +89,7 @@ export default {
     },
     logout() {
       const routeReplace = this.$store.state.userDetails.adminLevel.includes(
-        "superadmin"
+        "admin"
       )
         ? { name: "LoginAdmin" }
         : { name: "Login" };
@@ -107,6 +107,9 @@ export default {
           params: { id: myId },
           query: { action: "account-settings" },
         });
+        setTimeout(() => {
+          location.reload();
+        }, 200);
       } else {
         this.$router.push({
           name: "EditHost",

@@ -1,10 +1,13 @@
 <template lang="pug">
 div
-  h6.m-3(style="cursor: pointer" @click="$router.push({ name: 'Login' })")
+  h6.m-3(style="cursor: pointer" @click="$router.push({ name: 'Index' })")
     i.bi.bi-arrow-left-circle-fill.me-2
-    | Go to sign in page
+    | Go to main page
   h1.fw-bold.text-center.mt-5 Apply as a Host
   p.fw-light.text-center Getting started is easy, just fill out the form details below.
+  p.text-center.text-secondary(style="font-size: 0.8rem;" ) Already have an account? 
+    span(style="cursor: pointer; color: #4287f5" @click="$router.push({ name: 'Login' })") Click here to sign in.
+
   .d-flex.justify-content-center.mt-5
     
     HostsForm(v-model='form' @submitForm='submitForm' :mode='mode' :isLoading='isLoading' :isForPending="true")
@@ -30,7 +33,7 @@ export default {
         birthDate: "",
         gender: "",
         address: "",
-        country: "",
+        country: "Philippines",
         mobileNumber: "",
         avatarImageUrl: "",
         upliveName: "",

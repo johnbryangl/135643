@@ -11,6 +11,7 @@ axios.defaults.headers = {
 
 axios.defaults.timeout = 20000;
 axios.defaults.baseURL = "https://e-see.azurewebsites.net/api/";
+// axios.defaults.baseURL = "http://localhost:5000/api/";
 
 const apiClient = axios.create();
 
@@ -32,11 +33,18 @@ apiClient.interceptors.response.use(
   },
   function (error) {
     if (error.response.data.status == 401) {
-      store.dispatch("logout");
-      if (router.currentRoute.value.name == "LoginAdmin") {
-        router.replace({ name: "LoginAdmin" });
+      if (
+        error?.response?.data?.message?.description ==
+        "The old password is incorrect."
+      ) {
+        //
       } else {
-        router.replace({ name: "Login" });
+        store.dispatch("logout");
+        if (router.currentRoute.value.name == "LoginAdmin") {
+          router.replace({ name: "LoginAdmin" });
+        } else {
+          router.replace({ name: "Login" });
+        }
       }
     }
     // eslint-disable-next-line no-undef

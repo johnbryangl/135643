@@ -26,13 +26,14 @@ div
           .d-flex.justify-content-end 
             el-date-picker(style="max-width: 300px;" type="daterange" range-separator="to" format="MMM DD, YYYY" value-format="YYYY-MM-DD" @change='fetchLeaderboard'  v-model='dates' required start-placeholder="Start date" end-placeholder="End date")
           div.w-100(v-if='leaderboard.length > 0')
-            el-table.w-100.mt-3(:data="leaderboard")
-              el-table-column(width="70" label='Rank')
+            //- :default-sort="{ prop: 'total_ucoins', order: 'descending' }"
+            el-table.w-100.mt-3(:data="leaderboard" )
+              el-table-column(width="70" label='Rank' type='index')
                 template(#default='scope')
-                  span.text-center.d-block.my-2(v-if="scope.row.rank == 1" style="font-size: 1.75rem") 🥇
-                  span.text-center.d-block.my-2(v-else-if="scope.row.rank == 2" style="font-size: 1.75rem") 🥈
-                  span.text-center.d-block.my-2(v-else-if="scope.row.rank == 3" style="font-size: 1.75rem") 🥉
-                  span.text-center.d-block.my-2(v-else) {{ scope.row.rank }}
+                    span.text-center.d-block.my-2(v-if="scope.$index + 1 == 1" style="font-size: 1.75rem") 🥇
+                    span.text-center.d-block.my-2(v-else-if="scope.$index + 1 == 2" style="font-size: 1.75rem") 🥈
+                    span.text-center.d-block.my-2(v-else-if="scope.$index + 1  == 3" style="font-size: 1.75rem") 🥉
+                    span.text-center.d-block.my-2(v-else style="font-size: 1rem") {{ scope.$index + 1 }}
               el-table-column(width="90")
                 template(#default='scope')
                   .d-flex.align-items-center
@@ -126,7 +127,6 @@ export default {
         );
 
         this.leaderboard = data.result;
-        console.log("no string");
       }
       this.isLoading = false;
     },

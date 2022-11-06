@@ -41,7 +41,7 @@ div
             el-button.me-2(text :disabled='isLoading' @click="$router.push({ name: 'Announcements' })") 
               | Discard
             el-button(v-if="isCreateMode" type='primary' native-type='submit' :loading='isLoading') Create
-            el-button(v-else type='primary' native-type='submit' :loading='isLoading') Edit
+            el-button(v-else type='primary' native-type='submit' :loading='isLoading') Save
 
 </template>
 

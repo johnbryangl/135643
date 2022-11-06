@@ -33,6 +33,7 @@ export default {
       form: {
         id: "",
         email: "",
+        oldPassword: "",
         password: "",
         confirmPassword: "",
         lastName: "",
@@ -43,7 +44,8 @@ export default {
         country: "",
         mobileNumber: "",
         // eslint-disable-next-line prettier/prettier
-        avatarImageUrl: "https://ik.imagekit.io/intelliemed/default-avatar_cunOc4PbJ.jpg?ik-sdk-version=javascript-1.4.3&updatedAt=1660126551582",
+        avatarImageUrl:
+          "https://ik.imagekit.io/intelliemed/default-avatar_cunOc4PbJ.jpg?ik-sdk-version=javascript-1.4.3&updatedAt=1660126551582",
         upliveName: "",
         instagramAccount: "",
         facebookAccount: "",
@@ -99,9 +101,13 @@ export default {
         }
       } else {
         try {
-          await apiClient.patch(`/hosts/${this.$route.params.id}`, form, {
-            headers: { "Content-Type": "multipart/form-data" },
-          });
+          const { data } = await apiClient.patch(
+            `/hosts/${this.$route.params.id}`,
+            form,
+            {
+              headers: { "Content-Type": "multipart/form-data" },
+            }
+          );
           if (!this.$route.query.action) {
             // eslint-disable-next-line no-undef
             ElNotification({
@@ -112,6 +118,12 @@ export default {
             });
             this.$router.replace({ name: "Hosts" });
           } else {
+            const newName = data?.result[1][0]?.fullName;
+            const newEmail = data?.result[1][0]?.email;
+            let userDetails = JSON.parse(localStorage.getItem("userDetails"));
+            userDetails.fullName = newName;
+            userDetails.email = newEmail;
+            localStorage.setItem("userDetails", JSON.stringify(userDetails));
             // eslint-disable-next-line no-undef
             ElNotification({
               title: "Notification",
@@ -120,6 +132,7 @@ export default {
               type: "success",
               duration: 5000,
             });
+            setTimeout(() => location.reload(), 500);
           }
         } catch (error) {
           console.log(error);

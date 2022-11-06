@@ -22,13 +22,13 @@ el-card(shadow='never' :body-style='{padding:0}')
         | Personal Details
       el-form-item(label='First name')
         .w-100(v-if="mode !== 'view'")
-          el-input(v-model='modelValue.firstName' @input="emitValue({ firstName: $event })" name="firstName" required)
+          el-input(v-model='modelValue.firstName' @keypress="$store.getters.isNotNumber($event)" @input="emitValue({ firstName: $event })" name="firstName" required)
         .w-100(v-else) {{ modelValue.firstName }}
 
 
       el-form-item(label='Last name')
         .w-100(v-if="mode !== 'view'")
-          el-input(v-model='modelValue.lastName' @input="emitValue({ lastName: $event })" name="lastName" required)
+          el-input(v-model='modelValue.lastName' @keypress="$store.getters.isNotNumber($event)" @input="emitValue({ lastName: $event })" name="lastName" required)
         .w-100(v-else) {{ modelValue.lastName }}
 
     
@@ -74,8 +74,11 @@ el-card(shadow='never' :body-style='{padding:0}')
           
           el-input(v-model='modelValue.email' @input="emitValue({ email: $event })" name="email" required)
         .w-100(v-else) {{ modelValue.email }}
+
+      el-form-item(label='Old password' v-if='$route.query.action')
+        el-input(v-model='modelValue.oldPassword' @input="emitValue({ oldPassword: $event })" name="oldPassword" type='password'  show-password :required='true')
         
-      el-form-item(label='Password' v-if="mode !== 'view'")
+      el-form-item(:label=`$route.query.action? 'New password': 'Password'` v-if="mode !== 'view'")
         el-input(v-model='modelValue.password' @input="emitValue({ password: $event })" name="password" type='password'  show-password :required='mode == "create"')
 
       el-form-item(label='Confirm password' v-if="mode !== 'view'")
@@ -90,7 +93,7 @@ el-card(shadow='never' :body-style='{padding:0}')
         el-button(v-if="mode == 'create'" type='primary' native-type='submit' :loading='isLoading') Create
         el-button(v-else-if="mode == 'edit'" type='primary' native-type='submit' :loading='isLoading') 
           span(v-if='$route.query.action') Save changes
-          span(v-else) Edit
+          span(v-else) Save
 
 </template>
 

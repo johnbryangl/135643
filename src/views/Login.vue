@@ -15,7 +15,7 @@ h6.m-3(style="cursor: pointer" @click="$router.push({ name: 'Index' })")
           div.h1.dblue.mt-5(style="font-weight: 800 !important") Get Started
           span.text-secondary(style="font-weight: 200; font-size: 0.7rem;") Not registered yet? 
           br
-          span(style="font-size: 0.7rem; cursor: pointer" @click="$router.push({ name: 'ApplyAsAHost' })") Click here to create an account.
+          span(style="font-size: 0.7rem; cursor: pointer; color: #4287f5" @click="$router.push({ name: 'ApplyAsAHost' })") Click here to create an account.
           el-form.mt-5(label-position='top' :model='form' @submit.prevent='login' style="width: 250px;")
             el-form-item(label='Email address')
               el-input(v-model='form.email' required type='email')

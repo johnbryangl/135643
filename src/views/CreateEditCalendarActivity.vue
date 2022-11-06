@@ -28,7 +28,7 @@ div
               el-option(v-for="option in $store.state.groupOptions" :key='option' :label='option' :value='option')
 
           el-form-item(label='Date')
-            el-date-picker.w-100.date-input(type="date"  format="MMMM D, YYYY" value-format="YYYY-MM-DD" v-model='form.date' name="date" required)
+            el-date-picker.w-100.date-input(type="date" @change="validateDate" format="MMMM D, YYYY" value-format="YYYY-MM-DD" v-model='form.date' name="date" required)
           el-form-item(label='Details')
             el-input(v-model='form.details' name="details" required type='textarea')
           
@@ -46,7 +46,7 @@ div
             el-button.me-2(text :disabled='isLoading' @click="$router.push({ name: 'CalendarActivities' })") 
               | Discard
             el-button(v-if="isCreateMode" type='primary' native-type='submit' :loading='isLoading') Create
-            el-button(v-else type='primary' native-type='submit' :loading='isLoading') Edit
+            el-button(v-else type='primary' native-type='submit' :loading='isLoading') Save
 
 </template>
 
@@ -74,6 +74,22 @@ export default {
     };
   },
   methods: {
+    validateDate(value) {
+      const currentDate = new Date(new Date().toLocaleDateString());
+      const selectedDate = new Date(value);
+      if (selectedDate > new Date("1970-01-01")) {
+        if (selectedDate <= currentDate) {
+          // eslint-disable-next-line no-undef
+          ElNotification({
+            title: "Notification",
+            message: "Date cannot be before the current date.",
+            type: "error",
+            duration: 5000,
+          });
+          this.form.date = "";
+        }
+      }
+    },
     async submitForm() {
       if (!this.$store.getters.validateForm(this.form)) {
         // eslint-disable-next-line no-undef
@@ -85,6 +101,20 @@ export default {
         });
         return false;
       }
+
+      const currentDate = new Date(new Date().toLocaleDateString());
+      const selectedDate = new Date(this.form.date);
+      if (selectedDate <= currentDate) {
+        // eslint-disable-next-line no-undef
+        ElNotification({
+          title: "Notification",
+          message: "Date cannot be before the current date.",
+          type: "error",
+          duration: 5000,
+        });
+        this.form.date = "";
+      }
+
       this.isLoading = true;
       if (this.isCreateMode) {
         try {

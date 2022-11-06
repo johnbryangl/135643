@@ -192,7 +192,7 @@ const routes = [
         meta: {
           permissions: {
             requireAuth: true,
-            allowedRoles: ["superadmin"],
+            allowedRoles: ["superadmin", "admin"],
           },
         },
       },

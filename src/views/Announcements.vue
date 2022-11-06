@@ -76,6 +76,10 @@ export default {
             name: "Task",
             value: "Task",
           },
+          {
+            name: "Others",
+            value: "Others",
+          },
         ],
       },
       form: {
@@ -141,6 +145,7 @@ export default {
           type: "success",
           duration: 5000,
         });
+        setTimeout(() => location.reload(), 900);
       } catch (error) {
         console.log(error);
       }

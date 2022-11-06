@@ -58,6 +58,11 @@ export default {
       yearChart: "2022",
       yearChartAggregated: {},
       dates: "",
+      displayedSeries: {
+        Hours: true,
+        Days: true,
+        uCoins: true,
+      },
       options: {
         dataLabels: {
           enabled: false,
@@ -66,7 +71,7 @@ export default {
           curve: "smooth",
         },
         legend: {
-          show: false,
+          show: true,
         },
         id: "performance-chart",
         xaxis: {
@@ -95,11 +100,6 @@ export default {
       },
       series: null,
       seriesBackup: null,
-      displayedSeries: {
-        Hours: true,
-        Days: true,
-        uCoins: true,
-      },
       exportDate: "",
       isExporting: false,
     };
@@ -206,7 +206,63 @@ export default {
         }
         this.isLoading = false;
       } else {
-        this.series = null;
+        const { data } = await apiClient.get(
+          `/reports/?reportType=overallCompanyPerformance&whole=true`
+        );
+        if (data.result.length > 0) {
+          const hoursSeries = [];
+          const daysSeries = [];
+          const ucoinsSeries = [];
+          this.yearChartAggregated.total_hours = 0;
+          this.yearChartAggregated.total_days = 0;
+          this.yearChartAggregated.total_ucoins = 0;
+          for (let i = 1; i <= 12; i++) {
+            const hasAgg = data.result.find((el) => el.month == i);
+            if (hasAgg) {
+              hoursSeries.push(hasAgg.total_hours);
+              daysSeries.push(hasAgg.total_days);
+              ucoinsSeries.push(hasAgg.total_ucoins);
+              this.yearChartAggregated.total_hours += Number(
+                hasAgg.total_hours
+              );
+              this.yearChartAggregated.total_days += Number(hasAgg.total_days);
+              this.yearChartAggregated.total_ucoins += Number(
+                hasAgg.total_ucoins
+              );
+            } else {
+              hoursSeries.push(0);
+              daysSeries.push(0);
+              ucoinsSeries.push(0);
+            }
+          }
+
+          this.seriesBackup = [
+            {
+              name: "Hours",
+              data: hoursSeries,
+            },
+            {
+              name: "Days",
+              data: daysSeries,
+            },
+            {
+              name: "uCoins",
+              data: ucoinsSeries,
+            },
+          ];
+
+          this.series = this.seriesBackup;
+          this.performanceSummary = data.result;
+        } else {
+          // eslint-disable-next-line no-undef
+          ElNotification({
+            title: "Notification",
+            message: "There are no data to show for overall performance.",
+            type: "warning",
+            duration: 5000,
+          });
+          this.series = null;
+        }
       }
       this.isLoading = false;
     },
